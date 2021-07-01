@@ -21,7 +21,7 @@ def argument_parser():
     args.add_argument("--bert_model", default='bert-base-uncased', type=str,
                       help="Bert pre-trained model selected in the list: bert-base-uncased, "
                            "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
-    args.add_argument("--num-train-epochs",
+    args.add_argument("--num_train_epochs",
                       default=2.0,
                       type=float,
                       help="Total number of training epochs to perform.")
@@ -30,7 +30,7 @@ def argument_parser():
                       default=-1,
                       help="local_rank for distributed training on gpus")
     args.add_argument("--debug",
-                      type=float,
+                      type=bool,
                       default=True,
                       help="Whether debug mode or not.")
     args.add_argument("--do_train",
