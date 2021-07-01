@@ -31,7 +31,7 @@ def argument_parser():
                       help="local_rank for distributed training on gpus")
     args.add_argument("--debug",
                       type=bool,
-                      default=True,
+                      default=False,
                       help="Whether debug mode or not.")
     args.add_argument("--do_train",
                       default=True,

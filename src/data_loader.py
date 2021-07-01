@@ -39,6 +39,8 @@ def load_examples(args, tokenizer, datatype):
     if args.debug and args.do_train:
         sample_datasets = sample_datasets.select(range(50))
 
+    print("The {} size of datasets is loaded.".format(sample_datasets.num_rows))
+
     features_cols = ['input_ids', 'attention_mask', 'labels']
     remove_cols = [col for col in sample_datasets.column_names if col not in features_cols]
     sample_datasets = sample_datasets.remove_columns(remove_cols)
