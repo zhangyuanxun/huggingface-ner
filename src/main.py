@@ -134,9 +134,12 @@ def run():
 
     # load datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
-    train_datasets, labels_list = load_examples(args, tokenizer, 'train')
 
     if args.do_train:
+        # load the training datasets
+        print("the debug is {}. ".format(args.debug))
+        train_datasets, labels_list = load_examples(args, tokenizer, 'train')
+
         model = NERModel(bert_model_name=args.bert_model, num_labels=len(labels_list))
         model.to(args.device)
 
