@@ -118,6 +118,7 @@ def set_up_device(args):
     else:
         torch.distributed.init_process_group(backend="nccl")
         device = torch.device("cuda", args.local_rank)
+        torch.cuda.set_device(args.local_rank)
         args.num_gpu = 1
         args.device = "gpu"
 
@@ -160,6 +161,7 @@ def run():
 
         # load the model
         print("load the model...")
+        torch.cuda.empty_cache()
         model = NERModel(bert_model_name=args.bert_model, num_labels=len(labels_list))
         model.load_state_dict(torch.load(os.path.join(args.output_dir, WEIGHTS_NAME), map_location="cpu"))
         model.to(args.device)

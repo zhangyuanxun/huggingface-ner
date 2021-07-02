@@ -1,5 +1,7 @@
 import torch
 from datasets import load_dataset, load_metric
+from torch.utils.data import TensorDataset, RandomSampler
+from torch.utils.data.distributed import DistributedSampler
 
 
 def convert_to_features(examples, tokenizer, args):
@@ -46,7 +48,11 @@ def load_examples(args, tokenizer, datatype):
     sample_datasets = sample_datasets.remove_columns(remove_cols)
     sample_datasets.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 
-    dataloader = torch.utils.data.DataLoader(sample_datasets, args.train_batch_size)
+    if datatype == 'train':
+        sampler = RandomSampler(sample_datasets) if args.local_rank == -1 else DistributedSampler(sample_datasets)
+        dataloader = torch.utils.data.DataLoader(sample_datasets, sampler=sampler, batch_size=args.train_batch_size)
+    else:
+        dataloader = torch.utils.data.DataLoader(sample_datasets, batch_size=args.train_batch_size)
 
     return dataloader, labels
 
