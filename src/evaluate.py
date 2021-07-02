@@ -5,9 +5,8 @@ import torch
 import seqeval.metrics
 
 
-def evaluate(args, model, tokenizer, datatype, output_file=None):
+def evaluate(args, model, tokenizer, dataloader, labels_list, output_file=None):
     print("Evaluation...")
-    dataloader, labels_list = load_examples(args, tokenizer, datatype)
     all_predictions = defaultdict(dict)
     all_labels = defaultdict(dict)
     all_input_ids = defaultdict(dict)

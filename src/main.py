@@ -155,13 +155,16 @@ def run():
 
     if args.do_eval:
         results = {}
+        # load the test datasets
+        dataloader, labels_list = load_examples(args, tokenizer, 'test')
+
         # load the model
         print("load the model...")
         model = NERModel(bert_model_name=args.bert_model, num_labels=len(labels_list))
         model.load_state_dict(torch.load(os.path.join(args.output_dir, WEIGHTS_NAME), map_location="cpu"))
         model.to(args.device)
         test_output_file = os.path.join(args.output_dir, "test_predictions.txt")
-        results.update({f"test_{k}": v for k, v in evaluate(args, model, tokenizer, "test", test_output_file).items()})
+        results.update({f"test_{k}": v for k, v in evaluate(args, model, tokenizer, dataloader, labels_list, test_output_file).items()})
 
         with open(os.path.join(args.output_dir, "results.json"), "w") as f:
             json.dump(results, f)
