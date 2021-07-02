@@ -30,19 +30,19 @@ def argument_parser():
                       default=-1,
                       help="local_rank for distributed training on gpus")
     args.add_argument("--debug",
-                      type=bool,
                       default=False,
+                      action='store_true',
                       help="Whether debug mode or not.")
     args.add_argument("--do_train",
-                      default=True,
+                      default=False,
                       action='store_true',
                       help="Whether to run training.")
     args.add_argument("--no_cuda",
-                      default=True,
-                      type=bool,
+                      default=False,
+                      action='store_true',
                       help="Whether to use CUDA when available")
     args.add_argument("--do_eval",
-                      default=True,
+                      default=False,
                       action='store_true',
                       help="Whether to run eval on the dev set.")
     args.add_argument("--learning_rate",
@@ -114,7 +114,7 @@ def set_up_device(args):
     elif args.local_rank == -1:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         args.num_gpu = torch.cuda.device_count()
-        args.device = "gpu"
+        args.device = device.type
     else:
         torch.distributed.init_process_group(backend="nccl")
         device = torch.device("cuda", args.local_rank)
@@ -137,7 +137,6 @@ def run():
 
     if args.do_train:
         # load the training datasets
-        print("the debug is {}. ".format(args.debug))
         train_datasets, labels_list = load_examples(args, tokenizer, 'train')
 
         model = NERModel(bert_model_name=args.bert_model, num_labels=len(labels_list))
