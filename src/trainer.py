@@ -22,7 +22,7 @@ class Trainer(object):
                 model,
                 device_ids=[self.args.local_rank],
                 output_device=self.args.local_rank,
-                find_unused_parameters=True,
+                find_unused_parameters=False,
             )
 
         epoch = 0
