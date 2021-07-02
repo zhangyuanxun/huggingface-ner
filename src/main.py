@@ -135,7 +135,7 @@ def run():
 
     # load datasets
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
-
+    print("the device is: {}".format(args.device))
     if args.do_train:
         # load the training datasets
         train_datasets, labels_list = load_examples(args, tokenizer, 'train')
