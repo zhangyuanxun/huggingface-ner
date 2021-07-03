@@ -15,6 +15,9 @@ class NERModel(nn.Module):
 
         # get bert model
         self.bert = BertModel.from_pretrained(bert_model_name)
+        for param in self.bert.parameters():
+            param.requires_grad = False
+
         self.config = BertConfig.from_pretrained(bert_model_name)
 
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
@@ -41,11 +44,9 @@ class NERModel(nn.Module):
             else:
                 loss = loss_fn(logits.view(-1, self.num_labels), labels.view(-1))
 
-        return loss, logits, outputs.hidden_states, outputs.attentions
-
-        # # return NERModelOutput(
-        #     loss=loss,
-        #     logits=logits,
-        #     hidden_states=outputs.hidden_states,
-        #     attentions=outputs.attentions,
-        # # )
+        return NERModelOutput(
+            loss=loss,
+            logits=logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )

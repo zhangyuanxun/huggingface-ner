@@ -35,7 +35,7 @@ class Trainer(object):
                 for step, batch in enumerate(self.dataloader):
                     inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
                     outputs = model(**inputs)
-                    loss = outputs[0]
+                    loss = outputs.loss
 
                     if self.args.gradient_accumulation_steps > 1:
                         loss = loss / self.args.gradient_accumulation_steps
