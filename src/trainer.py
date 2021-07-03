@@ -19,10 +19,7 @@ class Trainer(object):
 
         if self.args.local_rank != -1:
             model = torch.nn.parallel.DistributedDataParallel(
-                model,
-                device_ids=[self.args.local_rank],
-                output_device=self.args.local_rank,
-                find_unused_parameters=True,
+                model
             )
 
         epoch = 0
