@@ -41,9 +41,11 @@ class NERModel(nn.Module):
             else:
                 loss = loss_fn(logits.view(-1, self.num_labels), labels.view(-1))
 
-        return NERModelOutput(
-            loss=loss,
-            logits=logits,
-            hidden_states=outputs.hidden_states,
-            attentions=outputs.attentions,
-        )
+        return loss, logits, outputs.hidden_states, outputs.attentions
+
+        # # return NERModelOutput(
+        #     loss=loss,
+        #     logits=logits,
+        #     hidden_states=outputs.hidden_states,
+        #     attentions=outputs.attentions,
+        # # )
