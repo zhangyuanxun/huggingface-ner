@@ -6,7 +6,7 @@ import seqeval.metrics
 
 
 def evaluate(args, model, tokenizer, dataloader, labels_list, output_file=None):
-    print("Evaluation...")
+    print("Start to evaluate the model...")
     all_predictions = defaultdict(dict)
     all_labels = defaultdict(dict)
     all_input_ids = defaultdict(dict)

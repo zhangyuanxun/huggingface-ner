@@ -15,6 +15,7 @@ class Trainer(object):
         self.scheduler = self._create_scheduler(self.optimizer)
 
     def train(self):
+        print("Start to train the model...")
         model = self.model
 
         if self.args.local_rank != -1:
