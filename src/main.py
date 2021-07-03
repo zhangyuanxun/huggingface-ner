@@ -86,7 +86,7 @@ def argument_parser():
                       type=int,
                       help="Total batch size for training.")
     args.add_argument("--max_grad_norm",
-                      default=1.0,
+                      default=0.0,
                       type=float,
                       help="Max grad norm.")
     args.add_argument("--max_seq_length",

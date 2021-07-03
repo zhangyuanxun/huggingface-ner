@@ -22,7 +22,7 @@ class Trainer(object):
                 model,
                 device_ids=[self.args.local_rank],
                 output_device=self.args.local_rank,
-                find_unused_parameters=True,
+                find_unused_parameters=False,
             )
 
         epoch = 0
@@ -44,8 +44,8 @@ class Trainer(object):
                     tr_loss += loss.item()
 
                     if (step + 1) % self.args.gradient_accumulation_steps == 0:
-                        # if self.args.max_grad_norm != 0.0:
-                        #     torch.nn.utils.clip_grad_norm_(model.parameters(), self.args.max_grad_norm)
+                        if self.args.max_grad_norm != 0.0:
+                            torch.nn.utils.clip_grad_norm_(model.parameters(), self.args.max_grad_norm)
 
                         self.optimizer.step()
                         self.scheduler.step()
