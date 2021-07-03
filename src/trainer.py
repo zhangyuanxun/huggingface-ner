@@ -67,6 +67,7 @@ class Trainer(object):
 
                         if global_step == self.num_train_steps:
                             break
+
                 if global_step == self.num_train_steps:
                     break
 
