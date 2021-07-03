@@ -15,6 +15,9 @@ class NERModel(nn.Module):
 
         # get bert model
         self.bert = BertModel.from_pretrained(bert_model_name)
+        for param in self.bert.parameters():
+            param.requires_grad = False
+
         self.config = BertConfig.from_pretrained(bert_model_name)
 
         self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
