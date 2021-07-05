@@ -25,6 +25,8 @@ class Trainer(object):
                 output_device=self.args.local_rank,
                 find_unused_parameters=False,
             )
+        elif self.args.num_gpu > 1:
+            model = torch.nn.DataParallel(model)
 
         epoch = 0
         global_step = 0
@@ -38,6 +40,9 @@ class Trainer(object):
                     outputs = model(**inputs)
                     loss = outputs.loss
 
+                    if self.args.num_gpu > 1:
+                        loss = loss.mean()
+                        
                     if self.args.gradient_accumulation_steps > 1:
                         loss = loss / self.args.gradient_accumulation_steps
 
