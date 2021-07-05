@@ -18,6 +18,10 @@ def argument_parser():
                       default="conll2003",
                       type=str,
                       help="The input dataset name, such as conll2003")
+    args.add_argument("--num_gpu",
+                      default=1,
+                      type=int,
+                      help="The numer of gpu for training")
     args.add_argument("--bert_model", default='bert-base-uncased', type=str,
                       help="Bert pre-trained model selected in the list: bert-base-uncased, "
                            "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
@@ -113,7 +117,6 @@ def set_up_device(args):
         args.device = "cpu"
     elif args.local_rank == -1:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        args.num_gpu = torch.cuda.device_count()
         args.device = device.type
     else:
         device = torch.device("cuda", args.local_rank)
