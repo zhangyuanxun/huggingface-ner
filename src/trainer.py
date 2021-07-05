@@ -37,8 +37,8 @@ class Trainer(object):
             while True:
                 for step, batch in enumerate(self.dataloader):
                     inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
-                    outputs = model(inputs['input_ids'], inputs['attention_mask'], inputs['labels'])
-                    loss = outputs.loss
+                    outputs = model(**inputs)
+                    loss = outputs['loss']
 
                     if self.args.num_gpu > 1:
                         loss = loss.mean()

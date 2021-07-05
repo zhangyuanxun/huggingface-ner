@@ -19,7 +19,7 @@ def evaluate(args, model, tokenizer, dataloader, labels_list, output_file=None):
 
         with torch.no_grad():
             outputs = model(**inputs)
-            logits = outputs.logits
+            logits = outputs['logits']
 
         for i in range(logits.size(0)):
             for j in range(logits.size(1)):
