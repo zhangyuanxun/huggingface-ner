@@ -26,7 +26,8 @@ class Trainer(object):
                 find_unused_parameters=False,
             )
         elif self.args.num_gpu > 1:
-            model = torch.nn.DataParallel(model)
+            device_ids = [i for i in range(self.args.num_gpu)]
+            model = torch.nn.DataParallel(model, device_ids=device_ids)
 
         epoch = 0
         global_step = 0
