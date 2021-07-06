@@ -34,7 +34,7 @@ class Trainer(object):
         tr_loss = 0.0
 
         model.train()
-        with tqdm(total=self.num_train_steps, disable=self.args.local_rank not in (-1, 0)) as pbar:
+        with tqdm(total=self.num_train_steps, disable=self.args.local_rank not in (-1, 0, 1)) as pbar:
             while True:
                 for step, batch in enumerate(self.dataloader):
                     inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
