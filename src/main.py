@@ -25,6 +25,10 @@ def argument_parser():
                       default=2.0,
                       type=float,
                       help="Total number of training epochs to perform.")
+    args.add_argument("--local_rank",
+                      default=-1,
+                      type=int,
+                      help="local rank of gpu")
     args.add_argument("--debug",
                       default=False,
                       action='store_true',
@@ -106,7 +110,9 @@ def set_up_device(args):
     if args.no_cuda:
         device = torch.device("cpu")
         args.num_gpu = 0
-        args.local_rank = -1
+    elif args.local_rank == -1:
+        device = torch.device("cuda")
+        args.num_gpu = 1
     else:
         args.local_rank = torch.distributed.get_rank()
         torch.cuda.set_device(args.local_rank)
