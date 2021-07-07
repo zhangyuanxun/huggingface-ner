@@ -114,7 +114,6 @@ def set_up_device(args):
         device = torch.device("cuda")
         args.num_gpu = 1
     else:
-        args.local_rank = torch.distributed.get_rank()
         torch.cuda.set_device(args.local_rank)
         device = torch.device("cuda", args.local_rank)
         torch.distributed.init_process_group(backend="nccl", init_method='env://')
