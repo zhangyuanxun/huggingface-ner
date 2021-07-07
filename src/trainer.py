@@ -25,24 +25,18 @@ class Trainer(object):
                 output_device=self.args.local_rank,
                 find_unused_parameters=False,
             )
-        elif self.args.num_gpu > 1:
-            device_ids = [i for i in range(self.args.num_gpu)]
-            model = torch.nn.DataParallel(model, device_ids=device_ids)
 
         epoch = 0
         global_step = 0
         tr_loss = 0.0
 
         model.train()
-        with tqdm(total=self.num_train_steps, disable=self.args.local_rank not in (-1, 0, 1)) as pbar:
+        with tqdm(total=self.num_train_steps, disable=self.args.local_rank not in (-1, 0)) as pbar:
             while True:
                 for step, batch in enumerate(self.dataloader):
                     inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
                     outputs = model(**inputs)
                     loss = outputs['loss']
-
-                    if self.args.num_gpu > 1:
-                        loss = loss.mean()
 
                     if self.args.gradient_accumulation_steps > 1:
                         loss = loss / self.args.gradient_accumulation_steps

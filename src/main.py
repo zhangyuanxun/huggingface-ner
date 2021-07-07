@@ -18,10 +18,6 @@ def argument_parser():
                       default="conll2003",
                       type=str,
                       help="The input dataset name, such as conll2003")
-    args.add_argument("--num_gpu",
-                      default=1,
-                      type=int,
-                      help="The numer of gpu for training")
     args.add_argument("--bert_model", default='bert-base-uncased', type=str,
                       help="Bert pre-trained model selected in the list: bert-base-uncased, "
                            "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
@@ -29,10 +25,6 @@ def argument_parser():
                       default=2.0,
                       type=float,
                       help="Total number of training epochs to perform.")
-    args.add_argument("--local_rank",
-                      type=int,
-                      default=-1,
-                      help="local_rank for distributed training on gpus")
     args.add_argument("--debug",
                       default=False,
                       action='store_true',
@@ -114,23 +106,20 @@ def set_up_device(args):
     if args.no_cuda:
         device = torch.device("cpu")
         args.num_gpu = 0
-        args.device = "cpu"
-    elif args.local_rank == -1:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        args.device = device.type
+        args.local_rank = -1
     else:
-        device = torch.device("cuda", args.local_rank)
+        args.local_rank = torch.distributed.get_rank()
         torch.cuda.set_device(args.local_rank)
+        device = torch.device("cuda", args.local_rank)
         torch.distributed.init_process_group(backend="nccl", init_method='env://')
         args.num_gpu = 1
-        args.device = device.type
-
+    args.device = device
     return device
 
 
 def run():
     args = argument_parser()
-    set_up_device(args)
+    device = set_up_device(args)
 
     # set up output folder
     if not os.path.exists(args.output_dir):
@@ -144,7 +133,7 @@ def run():
         train_datasets, labels_list = load_examples(args, tokenizer, 'train')
 
         model = NERModel(bert_model_name=args.bert_model, num_labels=len(labels_list))
-        model.to(args.device)
+        model.to(device)
 
         num_train_steps_per_epoch = len(train_datasets) // args.gradient_accumulation_steps
         num_train_steps = int(num_train_steps_per_epoch * args.num_train_epochs)
