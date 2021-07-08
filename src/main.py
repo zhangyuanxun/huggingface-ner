@@ -151,6 +151,9 @@ def run():
         print("Saving the model checkpoint to folder {}".format(args.output_dir))
         torch.save(model.state_dict(), os.path.join(args.output_dir, WEIGHTS_NAME))
 
+    if args.local_rank not in (0, -1):
+        return {}
+
     if args.do_eval:
         results = {}
         # load the test datasets

@@ -81,8 +81,8 @@ def load_datasets(args, tokenizer, datatype):
 
 
 def load_examples(args, tokenizer, datatype):
-    # if args.local_rank not in (-1, 0) and datatype == "train":
-    #     torch.distributed.barrier()
+    if args.local_rank not in (-1, 0) and datatype == "train":
+        torch.distributed.barrier()
 
     if args.data_name == "conll2003":
         examples = load_dataset("conll2003")
@@ -100,12 +100,15 @@ def load_examples(args, tokenizer, datatype):
     if args.debug and args.do_train:
         sample_datasets = sample_datasets.select(range(50))
 
-    print("The {} size of datasets is loaded.".format(sample_datasets.num_rows))
-
     features_cols = ['input_ids', 'attention_mask', 'labels']
     remove_cols = [col for col in sample_datasets.column_names if col not in features_cols]
     sample_datasets = sample_datasets.remove_columns(remove_cols)
     sample_datasets.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
+
+    print("[RANK {}]: The {} size of datasets is loaded.".format(args.local_rank, sample_datasets.num_rows))
+
+    if args.local_rank == 0 and datatype == "train":
+        torch.distributed.barrier()
 
     if datatype == 'train':
         sampler = RandomSampler(sample_datasets) if args.local_rank == -1 else DistributedSampler(sample_datasets)
