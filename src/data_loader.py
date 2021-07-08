@@ -81,8 +81,8 @@ def load_datasets(args, tokenizer, datatype):
 
 
 def load_examples(args, tokenizer, datatype):
-    if args.local_rank not in (-1, 0) and datatype == "train":
-        torch.distributed.barrier()
+    # if args.local_rank not in (-1, 0) and datatype == "train":
+    #     torch.distributed.barrier()
 
     if args.data_name == "conll2003":
         examples = load_dataset("conll2003")
