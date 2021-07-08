@@ -68,13 +68,14 @@ class Trainer(object):
             if global_step == self.num_train_steps:
                 break
 
-            print('[RANK {}]:| Finish at epoch {:3d}, loss {:5.5f}'.format(self.args.local_rank,
-                                                                           epoch, loss.item()))
+            print('[RANK {}]: Finish at epoch {:3d} / {:3d}, loss {:5.5f}'.format(self.args.local_rank,
+                                                                                  epoch, self.args.num_train_epochs,
+                                                                                  loss.item()))
             epoch += 1
 
-        print("[RANK {}]:| Finish training, global_step = {}, average loss = {}".format(self.args.local_rank,
-                                                                                        global_step,
-                                                                                        tr_loss / global_step))
+        print("[RANK {}]: Finish training, global_step = {}, average loss = {}".format(self.args.local_rank,
+                                                                                       global_step,
+                                                                                       tr_loss / global_step))
         return model, global_step, tr_loss / global_step
 
     def _create_optimizer(self, model):
