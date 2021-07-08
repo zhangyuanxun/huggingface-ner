@@ -36,7 +36,6 @@ class Trainer(object):
                 inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
                 outputs = model(**inputs)
                 loss = outputs['loss']
-                print('[RANK {}]: debug test1.'.format(self.args.local_rank))
 
                 if self.args.gradient_accumulation_steps > 1:
                     loss = loss / self.args.gradient_accumulation_steps
@@ -51,11 +50,6 @@ class Trainer(object):
                     self.optimizer.step()
                     self.scheduler.step()
                     model.zero_grad()
-
-                    print('[RANK {}]:| epoch {:3d} | {:5d}/{:5d} batches | loss {:5.2f}'.format(self.args.local_rank,
-                                                                                                epoch, step + 1,
-                                                                                                len(self.dataloader),
-                                                                                                loss.item()))
                     global_step += 1
 
                     if(self.args.local_rank in (-1, 0) and self.args.output_dir
@@ -74,9 +68,13 @@ class Trainer(object):
             if global_step == self.num_train_steps:
                 break
 
+            print('[RANK {}]:| Finish at epoch {:3d}, loss {:5.5f}'.format(self.args.local_rank,
+                                                                           epoch, loss.item()))
             epoch += 1
 
-        print("global_step = {}, average loss = {}".format(global_step, tr_loss / global_step))
+        print("[RANK {}]:| Finish training, global_step = {}, average loss = {}".format(self.args.local_rank,
+                                                                                        global_step,
+                                                                                        tr_loss / global_step))
         return model, global_step, tr_loss / global_step
 
     def _create_optimizer(self, model):
