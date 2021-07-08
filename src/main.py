@@ -148,7 +148,7 @@ def run():
 
     # save the model
     if args.do_train and args.local_rank in (0, -1):
-        print("Saving the model checkpoint to folder {}".format(args.output_dir))
+        print("[RANK: {}]: Saving the model checkpoint to folder {}".format(args.local_rank, args.output_dir))
         torch.save(model.state_dict(), os.path.join(args.output_dir, WEIGHTS_NAME))
 
     if args.local_rank not in (0, -1):
