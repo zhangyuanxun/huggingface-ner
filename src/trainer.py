@@ -69,7 +69,7 @@ class Trainer(object):
                 break
 
             print('[RANK {}]: Finish at epoch {:3d} / {:3d}, loss {:5.5f}'.format(self.args.local_rank,
-                                                                                  epoch, self.args.num_train_epochs,
+                                                                                  epoch, int(self.args.num_train_epochs),
                                                                                   loss.item()))
             epoch += 1
 
