@@ -15,7 +15,6 @@ class Trainer(object):
         self.scheduler = self._create_scheduler(self.optimizer)
 
     def train(self):
-        print("Start to train the model...")
         model = self.model
 
         if self.args.local_rank != -1:
@@ -31,48 +30,49 @@ class Trainer(object):
         tr_loss = 0.0
 
         model.train()
-        with tqdm(total=self.num_train_steps, disable=self.args.local_rank not in (-1, 0)) as pbar:
-            while True:
-                for step, batch in enumerate(self.dataloader):
-                    inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
-                    outputs = model(**inputs)
-                    loss = outputs['loss']
+        while True:
+            for step, batch in enumerate(self.dataloader):
+                inputs = {k: v.to(self.args.device) for k, v in Trainer._create_model_arguments(batch).items()}
+                outputs = model(**inputs)
+                loss = outputs['loss']
 
-                    if self.args.gradient_accumulation_steps > 1:
-                        loss = loss / self.args.gradient_accumulation_steps
+                if self.args.gradient_accumulation_steps > 1:
+                    loss = loss / self.args.gradient_accumulation_steps
 
-                    loss.backward()
-                    tr_loss += loss.item()
+                loss.backward()
+                tr_loss += loss.item()
 
-                    if (step + 1) % self.args.gradient_accumulation_steps == 0:
-                        if self.args.max_grad_norm != 0.0:
-                            torch.nn.utils.clip_grad_norm_(model.parameters(), self.args.max_grad_norm)
+                if (step + 1) % self.args.gradient_accumulation_steps == 0:
+                    if self.args.max_grad_norm != 0.0:
+                        torch.nn.utils.clip_grad_norm_(model.parameters(), self.args.max_grad_norm)
 
-                        self.optimizer.step()
-                        self.scheduler.step()
-                        model.zero_grad()
+                    self.optimizer.step()
+                    self.scheduler.step()
+                    model.zero_grad()
 
-                        pbar.set_description("epoch: %d loss: %.7f" % (epoch, loss.item()))
-                        pbar.update()
-                        global_step += 1
+                    print('[RANK {}]:| epoch {:3d} | {:5d}/{:5d} batches | loss {:5.2f}'.format(self.args.local_rank,
+                                                                                                epoch, step + 1,
+                                                                                                len(self.dataloader),
+                                                                                                loss.item()))
+                    global_step += 1
 
-                        if(self.args.local_rank in (-1, 0) and self.args.output_dir
-                                and self.args.save_steps > 0 and global_step % self.args.save_steps == 0):
+                    if(self.args.local_rank in (-1, 0) and self.args.output_dir
+                            and self.args.save_steps > 0 and global_step % self.args.save_steps == 0):
 
-                            output_dir = os.path.join(self.args.output_dir, "checkpoint-{}".format(global_step))
+                        output_dir = os.path.join(self.args.output_dir, "checkpoint-{}".format(global_step))
 
-                            if hasattr(model, "module"):
-                                torch.save(model.module.state_dict(), os.path.join(output_dir, WEIGHTS_NAME))
-                            else:
-                                torch.save(model.state_dict(), os.path.join(output_dir, WEIGHTS_NAME))
+                        if hasattr(model, "module"):
+                            torch.save(model.module.state_dict(), os.path.join(output_dir, WEIGHTS_NAME))
+                        else:
+                            torch.save(model.state_dict(), os.path.join(output_dir, WEIGHTS_NAME))
 
-                        if global_step == self.num_train_steps:
-                            break
+                    if global_step == self.num_train_steps:
+                        break
 
-                if global_step == self.num_train_steps:
-                    break
+            if global_step == self.num_train_steps:
+                break
 
-                epoch += 1
+            epoch += 1
 
         print("global_step = {}, average loss = {}".format(global_step, tr_loss / global_step))
         return model, global_step, tr_loss / global_step
